@@ -10,11 +10,11 @@ author: itodorova
 
 Don't really want to pull the devil by the tail, but I am off to a good start this year! 
 
-Wrote my first lines of [Tailwind CSS](https://tailwindcss.com/) (a css framework I think I *might* like), published a plugin for it on [npmjs](https://www.npmjs.com/package/@simplysuperb/ui-kit) and bundled my first `gem`!
+Wrote my first lines of [Tailwind CSS](https://tailwindcss.com/) /a css framework I *might* like/, published a plugin for it on `npm`: [@simplysuperb/ui-kit](https://www.npmjs.com/package/@simplysuperb/ui-kit) and bundled my first `gem`!
 
-I also made my first Jekyll theme ever [jekyll-theme-superb](https://github.com/simplysuperb-dev/jekyll-theme-superb), that this site is wearing.
+I also made my first Jekyll theme ever &mdash; [jekyll-theme-superb](https://github.com/simplysuperb-dev/jekyll-theme-superb), that this site is rocking.
 
-All of those things need a lot of polishing to become something <span class="text-green font-bold">actually great</span>.No words can express how amazing I feel right now, but here's a gif:
+Although all of those things need a lot of polishing to become something <span class="text-green font-bold">actually great</span>, no words can express how amazing I feel right now. But here's a gif trying:
 <div class="text-center">
 <img src="../assets/gifs/girl-throwing-bowl-at-floor.gif" alt="girl throws bowl on the floor" class="inline-block">
 </div>
