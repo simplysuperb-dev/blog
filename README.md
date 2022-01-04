@@ -13,8 +13,5 @@ This is a simple jekyll powered blog where I am documenting all my thoughts, pro
 - The struggles of a non-native English speaker
 
 ## Theme
-The theme the blog uses is created by me & available for free at:
-
-```
-@TODO: Add links to theme and previews of it.
-```
+The theme the blog uses is created by me & available for free at this repository: 
+https://github.com/simplysuperb-dev/jekyll-theme-superb
