@@ -18,7 +18,8 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: ssb. blog
+title: ssb.
+subtitle: /blog
 email: 
 description: >- # this means to ignore newlines until "baseurl:"
   A blog that follows the development process of my apps.
@@ -27,7 +28,7 @@ url: "https://blog.simplysuperb.app" # the base hostname & protocol for your sit
 github_username:  fakeheal
 
 # Build settings
-theme: minima
+theme: jekyll-theme-superb
 plugins:
   - jekyll-feed
 
