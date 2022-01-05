@@ -10,7 +10,7 @@ author: itodorova
 
 Don't really want to pull the devil by the tail, but I am off to a good start this year! 
 
-Wrote my first lines of [Tailwind CSS](https://tailwindcss.com/) /a css framework I *might* like/, published a plugin for it on `npm`: [@simplysuperb/ui-kit](https://www.npmjs.com/package/@simplysuperb/ui-kit) and bundled my first `gem`!
+Wrote my first lines of [Tailwind CSS](https://tailwindcss.com/) /a css framework I *might* like/, published a plugin for it on `npm`: [@simplysuperb/ui-kit](https://www.npmjs.com/package/@simplysuperb-dev/ui-kit) and bundled my first `gem`!
 
 I also made my first Jekyll theme ever &mdash; [jekyll-theme-superb](https://github.com/simplysuperb-dev/jekyll-theme-superb), that this site is rocking.
 
