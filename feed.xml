@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://blog.simplysuperb.app/feed.xml" rel="self" type="application/atom+xml" /><link href="https://blog.simplysuperb.app/" rel="alternate" type="text/html" /><updated>2024-04-19T11:50:40+00:00</updated><id>https://blog.simplysuperb.app/feed.xml</id><title type="html">ssb.</title><subtitle>Another tech related blog.</subtitle><entry><title type="html">Laravel 10+: Unit testing custom validation rules</title><link href="https://blog.simplysuperb.app/2024-04-19-laravel-10-plus-unit-test-custom-validation-rule" rel="alternate" type="text/html" title="Laravel 10+: Unit testing custom validation rules" /><published>2024-04-19T08:59:10+00:00</published><updated>2024-04-19T08:59:10+00:00</updated><id>https://blog.simplysuperb.app/laravel-10-plus-unit-test-custom-validation-rule</id><content type="html" xml:base="https://blog.simplysuperb.app/2024-04-19-laravel-10-plus-unit-test-custom-validation-rule"><![CDATA[<p>This post covers one of the ways you can test custom validation rules in Laravel. It assumes you’re running a Laravel version no older than 10.x.</p>
+
+<p>I prefer this way of testing as it’s the cleanest and more concise of others you can find online.</p>
+
+<p>I will be using the custom rule provided in the official documentation:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php">// ./app/Rules/Uppercase.php
+<span class="cp">&lt;?php</span>
+ 
+<span class="kn">namespace</span> <span class="nn">App\Rules</span><span class="p">;</span>
+ 
+<span class="kn">use</span> <span class="nc">Closure</span><span class="p">;</span>
+<span class="kn">use</span> <span class="nc">Illuminate\Contracts\Validation\ValidationRule</span><span class="p">;</span>
+ 
+<span class="kd">class</span> <span class="nc">Uppercase</span> <span class="kd">implements</span> <span class="nc">ValidationRule</span>
+<span class="p">{</span>
+    <span class="cd">/**
+     * Run the validation rule.
+     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">validate</span><span class="p">(</span><span class="kt">string</span> <span class="nv">$attribute</span><span class="p">,</span> <span class="kt">mixed</span> <span class="nv">$value</span><span class="p">,</span> <span class="kt">Closure</span> <span class="nv">$fail</span><span class="p">):</span> <span class="kt">void</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">strtoupper</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="o">!==</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$fail</span><span class="p">(</span><span class="s1">'The :attribute must be uppercase.'</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>This is a very simple and straightforward rule that tests a field to see if it contains only uppecase letters. It doesn’t take into account any other data in the request (or elsewhere). If you’ve worked with older Laravel versions, you will notice that the old <code class="language-plaintext highlighter-rouge">passes</code> and <code class="language-plaintext highlighter-rouge">message</code> have been replaced by a single <code class="language-plaintext highlighter-rouge">validate()</code> method’s that doesn’t return anything (but voidness).</p>
+
+<p>A test class for the code above looks like this:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php">// ./tests/Unit/Rules/Uppercase.php
+
+<span class="cp">&lt;?php</span>
+
+<span class="kn">namespace</span> <span class="nn">Tests\Unit\Rules</span><span class="p">;</span>
+
+<span class="kn">use</span> <span class="nc">Tests\TestCase</span><span class="p">;</span>
+<span class="kn">use</span> <span class="nc">App\Rules\Uppercase</span><span class="p">;</span>
+
+<span class="kd">class</span> <span class="nc">UppercaseTest</span> <span class="kd">extends</span> <span class="nc">TestCase</span> <span class="p">{</span>
+
+    <span class="k">const</span> <span class="no">VALID_STRINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'I1M UP3RC4SE'</span><span class="p">,</span>
+        <span class="s1">'I AM UPPERCASE'</span><span class="p">,</span>
+        <span class="s1">'0TH3R_UPP3RC4S3'</span>
+    <span class="p">];</span>
+
+    <span class="k">const</span> <span class="no">INVALID_STRINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'I MiGhT BE UPP3R'</span><span class="p">,</span>
+        <span class="s1">'bUt I am Not'</span>
+    <span class="p">];</span>
+
+    <span class="cd">/**
+    * @test
+    */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">validation_passes_for_valid_strings</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nv">$rulew</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uppercase</span><span class="p">();</span>
+        
+        <span class="k">foreach</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">VALID_STRINGS</span> <span class="k">as</span> <span class="nv">$string</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$rule</span><span class="o">-&gt;</span><span class="nf">validate</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="nv">$string</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$string</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">assertTrue</span><span class="p">(</span>
+                    <span class="kc">false</span><span class="p">,</span>
+                    <span class="nb">sprintf</span><span class="p">(</span><span class="s2">"String is not uppercase only: %s"</span><span class="p">,</span> <span class="nv">$string</span><span class="p">)</span>
+                <span class="p">);</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">asserTrue</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="cd">/**
+    * @test
+    */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">validation_fails_for_invalid_strings</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nv">$rulew</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uppercase</span><span class="p">();</span>
+        <span class="nv">$timesFailed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="k">foreach</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">INVALID_STRINGS</span> <span class="k">as</span> <span class="nv">$string</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$rule</span><span class="o">-&gt;</span><span class="nf">validate</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="nv">$string</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$string</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$timesFailed</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$timesFailed</span><span class="o">++</span><span class="p">;</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">assertEquals</span><span class="p">(</span>
+            <span class="nb">count</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">INVALID_STRINGS</span><span class="p">),</span>
+            <span class="nv">$timesFailed</span><span class="p">,</span>
+            <span class="s1">'All strings must fail validation'</span>
+        <span class="p">);</span>
+    <span class="p">}</span> 
+<span class="p">}</span></code></pre></figure>
+
+<p>The test <strong><em>validation_passes_for_valid_strings()</em></strong> creates an instance of our custom rule and then iterates all strings inside the <code class="language-plaintext highlighter-rouge">VALID_STRINGS</code> constant. On each iteration we call the <code class="language-plaintext highlighter-rouge">Uppercase::validate</code> method and (here comes the cool part) as a closure we’re telling our rule assert an always failing comparison and log our failing <code class="language-plaintext highlighter-rouge">$string</code>.</p>
+
+<p>Additionally, we are asserting a seemingly redundant check <code class="language-plaintext highlighter-rouge">true===true</code> to avoid getting this message in phpunit:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="o">!</span> <span class="n">validation</span> <span class="n">passes</span> <span class="k">for</span> <span class="n">valid</span> <span class="n">strings</span> <span class="err">→</span> <span class="nc">This</span> <span class="n">test</span> <span class="n">did</span> <span class="n">not</span> <span class="n">perform</span> <span class="n">any</span> <span class="n">assertions</span>  <span class="mf">0.50</span><span class="n">s</span>  
+
+<span class="nc">Tests</span><span class="o">:</span>    <span class="mi">1</span> <span class="nf">risky</span> <span class="p">(</span><span class="mi">0</span> <span class="n">assertions</span><span class="p">)</span></code></pre></figure>
+
+<p>The other test <strong><em>validation_fails_for_invalid_strings()</em></strong> counts the number of fails and asserts the number is equal to the total strings inside <code class="language-plaintext highlighter-rouge">INVALID_STRINGS</code>.</p>
+
+<p>And that’s it!</p>
+
+<p class="text-right">
+<strong><em>Stay humble</em></strong>,<br />
+<em>Iv</em>
+</p>]]></content><author><name>itodorova</name></author><summary type="html"><![CDATA[This post covers one of the ways you can test custom validation rules in Laravel. It assumes you’re running a Laravel version no older than 10.x.]]></summary></entry><entry><title type="html">Handling class names derived from variables with Blade and TailwindCSS</title><link href="https://blog.simplysuperb.app/2022-05-01-laravel-blade-tailwindcss-class-names-from-variable" rel="alternate" type="text/html" title="Handling class names derived from variables with Blade and TailwindCSS" /><published>2022-05-01T10:29:10+00:00</published><updated>2022-05-01T10:29:10+00:00</updated><id>https://blog.simplysuperb.app/laravel-blade-tailwindcss-class-names-from-variable</id><content type="html" xml:base="https://blog.simplysuperb.app/2022-05-01-laravel-blade-tailwindcss-class-names-from-variable"><![CDATA[<p>First, you need to have TailwindCSS already setup with Laravel. To do so, you can follow the <a href="https://tailwindcss.com/docs/guides/laravel">official documentation at TailwindCSS</a>.</p>
+
+<p>Since TailwindCSS requires classes to be present in whatever file you have specified inside your <code class="language-plaintext highlighter-rouge">content</code> array in <code class="language-plaintext highlighter-rouge">tailwindcss.config.js</code>, during your development you might experience missing styles due to the usage of variables inside your <code class="language-plaintext highlighter-rouge">*.blade.php</code> files (for example).</p>
+
+<p>Consider the following case, you have few buttons that look <em>exactly</em> the same except for their background color:</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- button for default operations: eg. login --&gt;</span>
+<span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">class=</span><span class="s">"bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 focus:ring-4 text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"</span><span class="nt">&gt;</span>Default<span class="nt">&lt;/button&gt;</span>
+
+<span class="c">&lt;!-- button for potentially dangerous operations: eg. disabling 2FA --&gt;</span>
+<span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">class=</span><span class="s">"bg-orange-700 hover:bg-orange-800 focus:orange-orange-300 focus:ring-4 text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"</span><span class="nt">&gt;</span>Warning<span class="nt">&lt;/button&gt;</span>
+
+<span class="c">&lt;!-- button for dangerous operations: eg. deleting --&gt;</span>
+<span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">class=</span><span class="s">"bg-red-700 hover:bg-red-800 focus:ring-red-300 focus:ring-4 text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"</span><span class="nt">&gt;</span>Danger<span class="nt">&lt;/button&gt;</span></code></pre></figure>
+
+<p>What changes in each button is the css utility classes applied for background color. Now since the markup is the same and the styling for text also matches each button, let’s create an <a href="https://laravel.com/docs/9.x/blade#anonymous-components">Anonymous Blade Component</a> button:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="c1">// ./resources/views/components/button.blade.php</span>
+<span class="o">@</span><span class="nf">props</span><span class="p">([</span><span class="s1">'color'</span> <span class="o">=&gt;</span> <span class="s1">'blue'</span><span class="p">])</span>
+
+<span class="o">&lt;</span><span class="n">button</span> <span class="n">type</span><span class="o">=</span><span class="s2">"button"</span> <span class="n">class</span><span class="o">=</span><span class="s2">"bg-</span><span class="si">{</span><span class="nv">$color</span><span class="si">}</span><span class="s2">-700 hover:bg-</span><span class="si">{</span><span class="nv">$color</span><span class="si">}</span><span class="s2">-800 focus:ring-</span><span class="si">{</span><span class="nv">$color</span><span class="si">}</span><span class="s2">-300 focus:ring-4 text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"</span><span class="o">&gt;</span>
+    <span class="p">{{</span><span class="nv">$slot</span><span class="p">}}</span>
+<span class="o">&lt;/</span><span class="n">button</span><span class="o">&gt;</span></code></pre></figure>
+
+<p>And use it in our view as follows:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="nt">&lt;x-button</span> <span class="na">color=</span><span class="s">"blue"</span><span class="nt">&gt;</span> Default <span class="nt">&lt;/x-button&gt;</span></code></pre></figure>
+
+<p>However, since the class names use php variable (<code class="language-plaintext highlighter-rouge">bg-{$color}-700</code>), TailwindCSS isn’t able to extract them (don’t forget to run <code class="language-plaintext highlighter-rouge">npm run watch</code> / <code class="language-plaintext highlighter-rouge">npm run dev</code>) and your buttons won’t look as expected (almost invisible, white text on white background <em>yikes</em>).</p>
+
+<p>To solve this, let’s create several new components, representing the state of our button and one base component containing the common styles between them, in a new folder at <code class="language-plaintext highlighter-rouge">views/components/button</code>:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="c1">// ./resources/views/components/button/base.blade.php</span>
+<span class="o">&lt;</span><span class="n">button</span> <span class="n">type</span><span class="o">=</span><span class="s2">"button"</span> <span class="p">{{</span><span class="nv">$attributes</span><span class="o">-&gt;</span><span class="nf">merge</span><span class="p">([</span><span class="n">class</span><span class="o">=</span><span class="s2">"text-white font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"</span><span class="p">])}}</span><span class="o">&gt;</span>
+    <span class="p">{{</span><span class="nv">$slot</span><span class="p">}}</span>
+<span class="o">&lt;/</span><span class="n">button</span><span class="o">&gt;</span></code></pre></figure>
+
+<p>Now let’s create the default “state” of our button:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="c1">// ./resources/views/components/button/default.blade.php</span>
+<span class="o">&lt;</span><span class="n">x</span><span class="o">-</span><span class="n">button</span><span class="mf">.</span><span class="n">base</span> <span class="n">class</span><span class="o">=</span><span class="s2">"bg-blue-700 hover:bg-blue-800"</span><span class="o">&gt;</span>
+<span class="p">{{</span><span class="nv">$slot</span><span class="p">}}</span>
+<span class="o">&lt;/</span><span class="n">x</span><span class="o">-</span><span class="n">button</span><span class="mf">.</span><span class="n">base</span><span class="o">&gt;</span></code></pre></figure>
+
+<p>And we can use the <code class="language-plaintext highlighter-rouge">Default</code> button in our views as follows:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="nt">&lt;x-button.default&gt;</span>Default<span class="nt">&lt;/x-button&gt;</span></code></pre></figure>
+
+<p>If you run <code class="language-plaintext highlighter-rouge">npm run dev</code>, you will see that the button now have background color, you can do the same thing for all button states that you have and tailwindcss will be able to extract those classes with no problem.</p>
+
+<p class="text-right">
+<strong><em>Stay humble</em></strong>,<br />
+<em>Iv</em>
+</p>]]></content><author><name>itodorova</name></author><summary type="html"><![CDATA[First, you need to have TailwindCSS already setup with Laravel. To do so, you can follow the official documentation at TailwindCSS.]]></summary></entry><entry><title type="html">Hello world in Liquid, spiced up with Tailwind CSS</title><link href="https://blog.simplysuperb.app/hello-world-in-liquid-with-tailwind-css" rel="alternate" type="text/html" title="Hello world in Liquid, spiced up with Tailwind CSS" /><published>2022-01-04T18:29:10+00:00</published><updated>2022-01-04T18:29:10+00:00</updated><id>https://blog.simplysuperb.app/hello-world-in-liquid-with-tailwind-css</id><content type="html" xml:base="https://blog.simplysuperb.app/hello-world-in-liquid-with-tailwind-css"><![CDATA[<p><strong class="text-green"><em>First… Happy New Year! 🥂🍾</em></strong></p>
+
+<p>Don’t really want to pull the devil by the tail, but I am off to a good start this year!</p>
+
+<p>Wrote my first lines of <a href="https://tailwindcss.com/">Tailwind CSS</a> /a css framework I <em>might</em> like/, published a plugin for it on <code class="language-plaintext highlighter-rouge">npm</code>: <a href="https://www.npmjs.com/package/@simplysuperb-dev/ui-kit">@simplysuperb/ui-kit</a> and bundled my first <code class="language-plaintext highlighter-rouge">gem</code>!</p>
+
+<p>I also made my first Jekyll theme ever — <a href="https://github.com/simplysuperb-dev/jekyll-theme-superb">jekyll-theme-superb</a>, that this site is rocking.</p>
+
+<p>Although all of those things need a lot of polishing to become something <span class="text-green font-bold">actually great</span>, no words can express how amazing I feel right now. But here’s a gif trying:</p>
+<div class="text-center">
+<img src="../assets/gifs/girl-throwing-bowl-at-floor.gif" alt="girl throws bowl on the floor" class="inline-block" />
+</div>
+
+<p class="text-right">
+<strong><em>Stay humble</em></strong>,<br />
+<em>Iv</em>
+</p>]]></content><author><name>itodorova</name></author><summary type="html"><![CDATA[First… Happy New Year! 🥂🍾]]></summary></entry></feed>

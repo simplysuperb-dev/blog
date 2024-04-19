@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Laravel 10+: Unit testing custom validation rules | ssb.</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Laravel 10+: Unit testing custom validation rules" />
+<meta name="author" content="itodorova" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This post covers one of the ways you can test custom validation rules in Laravel. It assumes you’re running a Laravel version no older than 10.x." />
+<meta property="og:description" content="This post covers one of the ways you can test custom validation rules in Laravel. It assumes you’re running a Laravel version no older than 10.x." />
+<link rel="canonical" href="https://blog.simplysuperb.app/2024-04-19-laravel-10-plus-unit-test-custom-validation-rule" />
+<meta property="og:url" content="https://blog.simplysuperb.app/2024-04-19-laravel-10-plus-unit-test-custom-validation-rule" />
+<meta property="og:site_name" content="ssb." />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-04-19T08:59:10+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Laravel 10+: Unit testing custom validation rules" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"itodorova"},"dateModified":"2024-04-19T08:59:10+00:00","datePublished":"2024-04-19T08:59:10+00:00","description":"This post covers one of the ways you can test custom validation rules in Laravel. It assumes you’re running a Laravel version no older than 10.x.","headline":"Laravel 10+: Unit testing custom validation rules","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.simplysuperb.app/2024-04-19-laravel-10-plus-unit-test-custom-validation-rule"},"url":"https://blog.simplysuperb.app/2024-04-19-laravel-10-plus-unit-test-custom-validation-rule"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://blog.simplysuperb.app/feed.xml" title="ssb." /><script src="/assets/js/main.js"></script>
+  </head><body class="font-serif">
+    <div class="container mx-auto"><header class="bg-white border-b border-porcelain desktop:border-none">
+    <nav>
+        <div class="flex justify-between px-4 desktop:px-0">
+            <div>
+                <a href="/" class="flex items-center py-2 desktop:py-4 text-h4 desktop:text-h3">
+                    
+                    <span class="text-graphite">s</span>
+                    <span class="text-green">sb</span>
+                    <span class="text-graphite">.</span>
+                    
+                    <span class="text-grey/50 hidden desktop:inline text-h5 ml-4">
+                        /blog
+                    </span>
+                    
+                </a>
+            </div>
+            <div class="hidden desktop:flex items-center space-x-5">
+                <a href="/" 
+                    class="text-graphite border-b-2 border-white hover:border-graphite hover:border-b-2 transition duration-300"
+                    >posts</a>
+                
+                
+                
+                
+                <a href="/about" 
+                    class="text-graphite border-b-2 border-white hover:border-graphite hover:border-b-2 transition duration-300"
+                    >
+                    about
+                </a>
+                
+                
+                
+                
+                
+                
+            </div>
+            <div class="desktop:hidden flex items-center">
+                <button class="outline-none mobile-menu-button">
+                    <svg class="w-6 h-6 text-graphite hover:text-green" x-show="!showMenu" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- mobile menu -->
+        <div class="hidden mobile-menu border-porcelain border-t">
+            <ul class="max-w-max flex space-x-5  bg-white p-4">
+                <li>
+                    <a href="/" 
+                        class="text-graphite border-b-2 border-white hover:border-graphite hover:border-b-2 transition duration-300"
+                        >posts</a>
+                </li>
+                
+                
+                
+                
+                <li>
+                    <a href="/about" 
+                        class="text-graphite border-b-2 border-white hover:border-graphite hover:border-b-2 transition duration-300"
+                        >
+                        about
+                    </a>
+                </li>
+                
+                
+                
+                
+                
+                
+            </ul>
+        </div>
+    </nav>
+</header><div class="px-4 py-2 desktop:px-0 post">
+  <div>
+    <span class="text-grey/50">0644</span>
+    <span class="text-graphite mx-4">itodorova</span>
+    <span class="text-graphite">19 Apr '24</span>
+  </div>
+  <h2 class="mb-6 mt-0 desktop:text-h4 text-h5 font-bold">Laravel 10+: Unit testing custom validation rules</h2>
+  <div class="font-serif font-thin post"><p>This post covers one of the ways you can test custom validation rules in Laravel. It assumes you’re running a Laravel version no older than 10.x.</p>
+
+<p>I prefer this way of testing as it’s the cleanest and more concise of others you can find online.</p>
+
+<p>I will be using the custom rule provided in the official documentation:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php">// ./app/Rules/Uppercase.php
+<span class="cp">&lt;?php</span>
+ 
+<span class="kn">namespace</span> <span class="nn">App\Rules</span><span class="p">;</span>
+ 
+<span class="kn">use</span> <span class="nc">Closure</span><span class="p">;</span>
+<span class="kn">use</span> <span class="nc">Illuminate\Contracts\Validation\ValidationRule</span><span class="p">;</span>
+ 
+<span class="kd">class</span> <span class="nc">Uppercase</span> <span class="kd">implements</span> <span class="nc">ValidationRule</span>
+<span class="p">{</span>
+    <span class="cd">/**
+     * Run the validation rule.
+     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">validate</span><span class="p">(</span><span class="kt">string</span> <span class="nv">$attribute</span><span class="p">,</span> <span class="kt">mixed</span> <span class="nv">$value</span><span class="p">,</span> <span class="kt">Closure</span> <span class="nv">$fail</span><span class="p">):</span> <span class="kt">void</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">strtoupper</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="o">!==</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$fail</span><span class="p">(</span><span class="s1">'The :attribute must be uppercase.'</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>This is a very simple and straightforward rule that tests a field to see if it contains only uppecase letters. It doesn’t take into account any other data in the request (or elsewhere). If you’ve worked with older Laravel versions, you will notice that the old <code class="language-plaintext highlighter-rouge">passes</code> and <code class="language-plaintext highlighter-rouge">message</code> have been replaced by a single <code class="language-plaintext highlighter-rouge">validate()</code> method’s that doesn’t return anything (but voidness).</p>
+
+<p>A test class for the code above looks like this:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php">// ./tests/Unit/Rules/Uppercase.php
+
+<span class="cp">&lt;?php</span>
+
+<span class="kn">namespace</span> <span class="nn">Tests\Unit\Rules</span><span class="p">;</span>
+
+<span class="kn">use</span> <span class="nc">Tests\TestCase</span><span class="p">;</span>
+<span class="kn">use</span> <span class="nc">App\Rules\Uppercase</span><span class="p">;</span>
+
+<span class="kd">class</span> <span class="nc">UppercaseTest</span> <span class="kd">extends</span> <span class="nc">TestCase</span> <span class="p">{</span>
+
+    <span class="k">const</span> <span class="no">VALID_STRINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'I1M UP3RC4SE'</span><span class="p">,</span>
+        <span class="s1">'I AM UPPERCASE'</span><span class="p">,</span>
+        <span class="s1">'0TH3R_UPP3RC4S3'</span>
+    <span class="p">];</span>
+
+    <span class="k">const</span> <span class="no">INVALID_STRINGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'I MiGhT BE UPP3R'</span><span class="p">,</span>
+        <span class="s1">'bUt I am Not'</span>
+    <span class="p">];</span>
+
+    <span class="cd">/**
+    * @test
+    */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">validation_passes_for_valid_strings</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nv">$rulew</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uppercase</span><span class="p">();</span>
+        
+        <span class="k">foreach</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">VALID_STRINGS</span> <span class="k">as</span> <span class="nv">$string</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$rule</span><span class="o">-&gt;</span><span class="nf">validate</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="nv">$string</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$string</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">assertTrue</span><span class="p">(</span>
+                    <span class="kc">false</span><span class="p">,</span>
+                    <span class="nb">sprintf</span><span class="p">(</span><span class="s2">"String is not uppercase only: %s"</span><span class="p">,</span> <span class="nv">$string</span><span class="p">)</span>
+                <span class="p">);</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">asserTrue</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="cd">/**
+    * @test
+    */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="n">validation_fails_for_invalid_strings</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nv">$rulew</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uppercase</span><span class="p">();</span>
+        <span class="nv">$timesFailed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+        <span class="k">foreach</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">INVALID_STRINGS</span> <span class="k">as</span> <span class="nv">$string</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$rule</span><span class="o">-&gt;</span><span class="nf">validate</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="nv">$string</span><span class="p">,</span> <span class="k">function</span> <span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$string</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$timesFailed</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$timesFailed</span><span class="o">++</span><span class="p">;</span>
+            <span class="p">});</span>
+        <span class="p">}</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="nf">assertEquals</span><span class="p">(</span>
+            <span class="nb">count</span><span class="p">(</span><span class="k">self</span><span class="o">::</span><span class="no">INVALID_STRINGS</span><span class="p">),</span>
+            <span class="nv">$timesFailed</span><span class="p">,</span>
+            <span class="s1">'All strings must fail validation'</span>
+        <span class="p">);</span>
+    <span class="p">}</span> 
+<span class="p">}</span></code></pre></figure>
+
+<p>The test <strong><em>validation_passes_for_valid_strings()</em></strong> creates an instance of our custom rule and then iterates all strings inside the <code class="language-plaintext highlighter-rouge">VALID_STRINGS</code> constant. On each iteration we call the <code class="language-plaintext highlighter-rouge">Uppercase::validate</code> method and (here comes the cool part) as a closure we’re telling our rule assert an always failing comparison and log our failing <code class="language-plaintext highlighter-rouge">$string</code>.</p>
+
+<p>Additionally, we are asserting a seemingly redundant check <code class="language-plaintext highlighter-rouge">true===true</code> to avoid getting this message in phpunit:</p>
+
+<figure class="highlight"><pre><code class="language-php" data-lang="php"><span class="o">!</span> <span class="n">validation</span> <span class="n">passes</span> <span class="k">for</span> <span class="n">valid</span> <span class="n">strings</span> <span class="err">→</span> <span class="nc">This</span> <span class="n">test</span> <span class="n">did</span> <span class="n">not</span> <span class="n">perform</span> <span class="n">any</span> <span class="n">assertions</span>  <span class="mf">0.50</span><span class="n">s</span>  
+
+<span class="nc">Tests</span><span class="o">:</span>    <span class="mi">1</span> <span class="nf">risky</span> <span class="p">(</span><span class="mi">0</span> <span class="n">assertions</span><span class="p">)</span></code></pre></figure>
+
+<p>The other test <strong><em>validation_fails_for_invalid_strings()</em></strong> counts the number of fails and asserts the number is equal to the total strings inside <code class="language-plaintext highlighter-rouge">INVALID_STRINGS</code>.</p>
+
+<p>And that’s it!</p>
+
+<p class="text-right">
+<strong><em>Stay humble</em></strong>,<br />
+<em>Iv</em>
+</p>
+</div>
+</div><div class="border-t border-porcelain py-4 text-caption">
+    <div class="text-center desktop:flex desktop:justify-between space-y-2">
+        <p>
+            2024 (C) All rights reserved.
+        </p>
+        <p>
+            <a href="https://github.com/simplysuperb-dev/jekyll-theme-superb" target="_blank"
+                class="inline-block text-green font-bold">superb.</a> theme
+            made with ❤️ by
+            <a href="https://itodorova.dev/" target="_blank"
+                class="py-1 px-2 bg-yellow inline-block text-white">itodorova.dev</a>
+        </p>
+    </div>
+</div></div>
+</body>
+</html>
