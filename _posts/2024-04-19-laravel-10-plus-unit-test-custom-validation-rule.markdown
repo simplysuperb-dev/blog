@@ -1,8 +1,8 @@
 ---
 layout: post
 title:  "Laravel 10+: Unit testing custom validation rules"
-date:   2022-04-19 11:59:10 +0300
-permalink: 2024-04-19-laravel-10-plus-unit-test-custom-validation-rule.markdown
+date:   2024-04-19 11:59:10 +0300
+permalink: /2024-04-19-laravel-10-plus-unit-test-custom-validation-rule
 author: itodorova
 ---
 
@@ -115,3 +115,8 @@ Additionally, we are asserting a seemingly redundant check `true===true` to avoi
 The other test `validation_fails_for_invalid_strings()` counts the number of fails and asserts the number is equal to the total strings inside `INVALID_STRINGS`.
 
 And that's it!
+
+<p class="text-right">
+<strong><em>Stay humble</em></strong>,<br/>
+<em>Iv</em>
+</p>

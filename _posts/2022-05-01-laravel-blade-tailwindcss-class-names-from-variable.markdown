@@ -67,3 +67,8 @@ And we can use the `Default` button in our views as follows:
 {% endhighlight %} 
 
 If you run `npm run dev`, you will see that the button now have background color, you can do the same thing for all button states that you have and tailwindcss will be able to extract those classes with no problem.
+
+<p class="text-right">
+<strong><em>Stay humble</em></strong>,<br/>
+<em>Iv</em>
+</p>
