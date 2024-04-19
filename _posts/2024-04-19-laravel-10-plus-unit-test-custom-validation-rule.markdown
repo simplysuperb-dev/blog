@@ -6,13 +6,11 @@ permalink: /2024-04-19-laravel-10-plus-unit-test-custom-validation-rule
 author: itodorova
 ---
 
-This post covers one of the ways you can test custom validation rules in Laravel. It assumes you're running a Laravel version no older than 10.x. 
-
-I prefer this way of testing as it's the cleanest and more concise of others you can find online.
+This post covers one of the ways you can test custom validation rules in Laravel. It assumes you're running a Laravel version no older than 10.x. I prefer this way of testing as it's the cleanest and more concise of others you can find online.
 
 I will be using the custom rule provided in the official documentation:
 
-{% highlight php %}
+{% highlight php linenos %}
 // ./app/Rules/Uppercase.php
 <?php
  
@@ -39,7 +37,7 @@ This is a very simple and straightforward rule that tests a field to see if it c
 
 A test class for the code above looks like this:
 
-{% highlight php %}
+{% highlight php linenos %}
 // ./tests/Unit/Rules/Uppercase.php
 
 <?php
@@ -107,17 +105,15 @@ The test **_validation_passes_for_valid_strings()_** creates an instance of our 
 
 Additionally, we are asserting a seemingly redundant check `true===true` to avoid getting this message in phpunit:
 
-{% highlight php %}
-! validation passes for valid strings → This test did not perform any assertions  0.50s  
-
-Tests:    1 risky (0 assertions)
-{% endhighlight %}
+> _! validation passes for valid strings → This test did not perform any assertions  0.50s_  
+> 
+> _Tests:    1 risky (0 assertions)_
 
 The other test **_validation_fails_for_invalid_strings()_** counts the number of fails and asserts the number is equal to the total strings inside `INVALID_STRINGS`.
 
 And that's it!
 
-<p class="text-right">
+<p>
 <strong><em>Stay humble</em></strong>,<br/>
 <em>Iv</em>
 </p>

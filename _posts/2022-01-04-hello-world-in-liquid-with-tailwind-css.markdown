@@ -19,7 +19,7 @@ Although all of those things need a lot of polishing to become something <span c
 <img src="../assets/gifs/girl-throwing-bowl-at-floor.gif" alt="girl throws bowl on the floor" class="inline-block">
 </div>
 
-<p class="text-right">
+<p>
 <strong><em>Stay humble</em></strong>,<br/>
 <em>Iv</em>
 </p>

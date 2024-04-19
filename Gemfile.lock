@@ -13,8 +13,6 @@ GEM
     forwardable-extended (2.6.0)
     google-protobuf (4.26.1-arm64-darwin)
       rake (>= 13)
-    google-protobuf (4.26.1-x86_64-darwin)
-      rake (>= 13)
     http_parser.rb (0.8.0)
     i18n (1.14.4)
       concurrent-ruby (~> 1.0)
@@ -40,8 +38,8 @@ GEM
       sass-embedded (~> 1.54)
     jekyll-seo-tag (2.8.0)
       jekyll (>= 3.8, < 5.0)
-    jekyll-theme-superb (0.1.4)
-      jekyll (~> 4.2)
+    jekyll-theme-superb (0.2.1)
+      jekyll (~> 4.3)
       jekyll-feed (~> 0.9)
       jekyll-seo-tag (~> 2.1)
     jekyll-watch (2.2.1)
@@ -81,7 +79,7 @@ PLATFORMS
 DEPENDENCIES
   jekyll (~> 4.3.3)
   jekyll-feed (~> 0.12)
-  jekyll-theme-superb (~> 0.1.4)
+  jekyll-theme-superb (~> 0.2.1)
   tzinfo (~> 1.2)
   tzinfo-data
   wdm (~> 0.1.1)
