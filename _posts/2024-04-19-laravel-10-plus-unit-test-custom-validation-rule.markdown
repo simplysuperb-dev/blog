@@ -33,7 +33,6 @@ class Uppercase implements ValidationRule
         }
     }
 }
-```
 {% endhighlight %}
 
 This is a very simple and straightforward rule that tests a field to see if it contains only uppecase letters. It doesn't take into account any other data in the request (or elsewhere). If you've worked with older Laravel versions, you will notice that the old `passes` and `message` have been replaced by a single `validate()` method's that doesn't return anything (but voidness).
