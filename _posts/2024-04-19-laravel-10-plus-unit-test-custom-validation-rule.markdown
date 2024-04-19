@@ -104,15 +104,17 @@ class UppercaseTest extends TestCase {
 
 {% endhighlight %}
 
-The test `validation_passes_for_valid_strings()` creates an instance of our custom rule and then iterates all strings inside the `VALID_STRINGS` constant. On each iteration we call the `Uppercase::validate` method and (here comes the cool part) as a closure we're telling our rule assert an always failing comparison and log our failing `$string`.
+The test **_validation_passes_for_valid_strings()_** creates an instance of our custom rule and then iterates all strings inside the `VALID_STRINGS` constant. On each iteration we call the `Uppercase::validate` method and (here comes the cool part) as a closure we're telling our rule assert an always failing comparison and log our failing `$string`.
 
 Additionally, we are asserting a seemingly redundant check `true===true` to avoid getting this message in phpunit:
 
-> ! validation passes for valid strings → This test did not perform any assertions  0.50s  
->
->  Tests:    1 risky (0 assertions)
+{% highlight php %}
+! validation passes for valid strings → This test did not perform any assertions  0.50s  
 
-The other test `validation_fails_for_invalid_strings()` counts the number of fails and asserts the number is equal to the total strings inside `INVALID_STRINGS`.
+Tests:    1 risky (0 assertions)
+{% endhighlight %}
+
+The other test **_validation_fails_for_invalid_strings()_** counts the number of fails and asserts the number is equal to the total strings inside `INVALID_STRINGS`.
 
 And that's it!
 

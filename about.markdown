@@ -3,7 +3,9 @@ layout: page
 title: about
 permalink: /about
 ---
-
+<style>
+    ul {list-style-type: circle} ul li {margin: 8px 0;}
+    </style>
 👋 Hi, stranger!
 
 This blog is a place for anyone who loves coding, solving puzzles, and learning new tricks. Here, you'll find helpful tips for working with php, laravel, js, react (& react native), and easy-to-understand guides on math (mostly discrete math problems).

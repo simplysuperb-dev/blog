@@ -22,7 +22,7 @@ title: ssb.
 subtitle: /blog
 email: 
 description: >- # this means to ignore newlines until "baseurl:"
-  A blog that follows the development process of my apps.
+  Another tech related blog.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://blog.simplysuperb.app" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  fakeheal
